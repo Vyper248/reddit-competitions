@@ -40,6 +40,11 @@ textarea {
     margin: 5px;
 }
 
+.slim.button {
+    padding-top: 3px;
+    padding-bottom: 3px;
+}
+
 .button.green {
     border-color: green;
     color: green;
@@ -70,12 +75,6 @@ textarea {
     border: 1px solid lightgray;
     border-radius: 5px;
     padding: 10px;
-}
-
-.addRegionBtn {
-    border-radius: 5px;
-    padding: 5px 10px;
-    cursor: pointer;
 }
 
 input:focus, textarea:focus {

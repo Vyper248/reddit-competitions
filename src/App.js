@@ -24,6 +24,7 @@ class App extends Component {
         };
         
         this.totalComments = 0;
+        this.results = {};
     }
     
     render() {        
@@ -42,8 +43,8 @@ class App extends Component {
                     <div className="regions">
                         <label>
                             Regions 
-                            <span onClick={this.addRegion} className="addRegionBtn button green">+</span>
-                            <span onClick={this.removeRegion} className="addRegionBtn button red">-</span>
+                            <span onClick={this.addRegion} className="slim button green">+</span>
+                            <span onClick={this.removeRegion} className="slim button red">-</span>
                         </label>
                         {
                             this.state.regions.map((region, i) => {
@@ -56,7 +57,7 @@ class App extends Component {
                         <button onClick={this.getComments} className="button green">{this.state.processText}</button>
                     </div>
                     <Stats stats={this.state.stats} total={this.state.total} downloadData={this.state.downloadData}/>
-                    <Winners winners={this.state.winners}/>
+                    <Winners winners={this.state.winners} pickWinners={this.pickWinners}/>
                     
                 </div>
             </div>
@@ -138,7 +139,7 @@ class App extends Component {
             });
                         
             //if more comments exist, then recursively gather these too
-            // array = [];//REMOVE WHEN DONE TESTING
+            array = [];//REMOVE WHEN DONE TESTING
             if (array && array.length > 0){
                 let link_id = 't3_'+data[0].data.children[0].data.id;
                 this.getMoreComments(array, link_id, allComments);
@@ -327,9 +328,22 @@ class App extends Component {
             total += extras[extra].length;
         });
         
+        this.results = regions;
+        
         //pick some winners
+        this.pickWinners();
+                
+        this.setState({stats, total, processText: 'Process', downloadData: encodeURI(downloadData)});
+    }
+    
+    pickWinners = () => {
         const winners = [];
-        Object.values(regions).forEach(region => {
+        
+        this.state.regions.forEach(region => {
+            this.results[region.name].qty = region.qty;
+        });
+        
+        Object.values(this.results).forEach(region => {
             let obj = {name: region.name, arr: []};
             let numbers = [];
             for (let i = 0; i < region.qty; i++){
@@ -337,12 +351,15 @@ class App extends Component {
                 while (numbers.includes(random)) random = parseInt(Math.random()*region.array.length);
                 numbers.push(random);
                 const chosen = region.array[random];
+                // const author = chosen.author;
+                // const userData = await fetch('https://www.reddit.com/user/'+author+'/about.json').then(resp => resp.json());
+                // console.log(userData);
                 obj.arr.push(chosen);
             }
             winners.push(obj);
         });
-                
-        this.setState({stats, total, processText: 'Process', downloadData: encodeURI(downloadData), winners});
+        
+        this.setState({winners});
     }
 }
 

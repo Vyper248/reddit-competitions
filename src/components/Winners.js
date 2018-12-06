@@ -1,14 +1,14 @@
 import React from 'react';
 import './Winners.css';
 
-const Winners = ({winners}) => {
+const Winners = ({winners, pickWinners}) => {
     if (winners.length === 0){
         return <div></div>;
     }
     
     return (
         <div className="winners roundedBorder">
-            <label>Winners</label>
+            <label>Winners - <span class="slim button green" onClick={pickWinners}>Pick Again</span></label>
             <div className="winnerRegions">
                 {
                     winners.map((region, i) => {
