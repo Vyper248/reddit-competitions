@@ -55,6 +55,10 @@ textarea {
     color: red;
 }
 
+.button:focus {
+    outline: none;
+}
+
 .button.green:hover {
     background-color: rgb(210, 255, 205);
     color: black;

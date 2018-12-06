@@ -11,7 +11,8 @@ class App extends Component {
         this.state = {
             regions: [
                 {name: 'EU', qty: 1, variations: ['EU', 'Eu', 'eU', 'Europe']},
-                {name: 'NA', qty: 1, variations: ['NA', 'Na', 'nA', 'North American', 'North America', 'North america', 'north america', 'N.A', 'N A']}
+                {name: 'NA', qty: 1, variations: ['NA', 'Na', 'nA', 'North American', 'North America', 'North america', 'north america', 'N.A', 'N A']},
+                {name: '', qty: 0, variations: []}
             ],
             ignoredUsers: [],
             url: 'https://www.reddit.com/r/PSVR/comments/9gykgl/transference_playstation_vr_game_key_giveaway_we/',
@@ -21,6 +22,7 @@ class App extends Component {
             total: 0,
             processText: 'Process',
             downloadData: '',
+            status: 0
         };
         
         this.totalComments = 0;
@@ -34,11 +36,11 @@ class App extends Component {
                 <div className="grid">
                     <div className="url">
                         <label>URL</label>
-                        <Input onChange={this.setUrl} value={this.state.url}/>
+                        <Input onChange={this.setUrl} value={this.state.url} placeholder='URL'/>
                     </div>
                     <div className="ignored">
                         <label>Users to Ignore</label>
-                        <textarea onChange={this.setIgnored}></textarea>
+                        <textarea onChange={this.setIgnored} placeholder="Such as previous winners. (Must be separated by a new line)"></textarea>
                     </div>
                     <div className="regions">
                         <label>
@@ -116,10 +118,10 @@ class App extends Component {
     }
     
     getComments = () => {
-        if (this.state.url.length === 0) return;
+        if (this.state.url.length === 0 || this.state.status === 1) return;
         //get json data from Reddit
         this.totalComments = 0;
-        this.setState({total: 0, winners: [], percentage: 0});
+        this.setState({total: 0, winners: [], stats: [], percentage: 0, processText: 'Loading', status: 1});
         let allComments = [];
         
         fetch(this.state.url+'.json').then(response => response.json()).then(data => {
@@ -139,7 +141,7 @@ class App extends Component {
             });
                         
             //if more comments exist, then recursively gather these too
-            array = [];//REMOVE WHEN DONE TESTING
+            // array = [];//REMOVE WHEN DONE TESTING
             if (array && array.length > 0){
                 let link_id = 't3_'+data[0].data.children[0].data.id;
                 this.getMoreComments(array, link_id, allComments);
@@ -277,6 +279,7 @@ class App extends Component {
         let regions = {};
         
         this.state.regions.forEach(region => {
+            if (region.name.length === 0) return;
             regions[region.name] = {
                 name: region.name,
                 conditions: region.variations,
@@ -333,13 +336,14 @@ class App extends Component {
         //pick some winners
         this.pickWinners();
                 
-        this.setState({stats, total, processText: 'Process', downloadData: encodeURI(downloadData)});
+        this.setState({stats, total, status: 0, processText: 'Process', downloadData: encodeURI(downloadData)});
     }
     
     pickWinners = () => {
         const winners = [];
         
         this.state.regions.forEach(region => {
+            if (region.name.length === 0) return;
             this.results[region.name].qty = region.qty;
         });
         

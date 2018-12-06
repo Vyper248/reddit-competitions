@@ -1,6 +1,6 @@
 .region {
     display: grid;
-    grid-template-columns: 60px auto 50px;
+    grid-template-columns: 80px auto 50px;
     grid-gap: 10px;
 }
 
