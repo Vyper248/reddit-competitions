@@ -1,0 +1,13 @@
+.region {
+    display: grid;
+    grid-template-columns: 60px auto 50px;
+    grid-gap: 10px;
+}
+
+.region div:first-child input {
+    text-align: center;
+}
+
+.region div:last-child input {
+    text-align: center;
+}

@@ -1,0 +1,4 @@
+.stats {
+    grid-column: 1 / span 2;
+    line-height: 2em;
+}

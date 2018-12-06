@@ -1,0 +1,15 @@
+.winners {
+    grid-column: 1 / span 2;
+}
+
+.winnerRegions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.winnerRegion {
+    margin: 10px;
+    padding: 10px 20px;
+    line-height: 1.5em;
+}

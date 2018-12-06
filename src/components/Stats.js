@@ -1,0 +1,21 @@
+import React from 'react';
+import './Stats.css';
+
+const Stats = ({stats, total, downloadData}) => {
+    if (stats.length === 0) return <div></div>;
+    
+    return (
+        <div className="stats roundedBorder">
+            <label>Stats</label>
+            {
+                stats.map((stat, i) => {
+                    return <div key={i}>{stat.name} - {stat.qty}</div>;
+                })
+            }
+            <div>Total - {total}</div>
+            <a href={"data:text/csv;charset=utf-8,"+downloadData} target="_blank" download="list.csv" rel="noopener noreferrer">Download</a>
+        </div>
+    );
+};
+
+export default Stats;
