@@ -1,0 +1,59 @@
+.userStats {
+    grid-column: 1 / span 2;
+    position: relative;
+    font-size: 0.8em;
+}
+
+.userTables {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    grid-gap: 10px;
+    width: 100%;
+    max-width: 800px;
+    margin: auto;
+    min-height: 600px;
+}
+
+.userTable {
+    width: 100%;
+    border-collapse: collapse;
+    
+}
+
+.tableDiv {
+    height: 300px;
+    overflow: scroll;
+    border-radius: 5px;
+}
+
+.userTable td {
+    border: 1px solid lightgray;
+    padding: 5px;
+}
+
+.userTable td:first-child {
+    border-left: none;
+}
+
+.userTable td:last-child {
+    border-right: none;
+}
+
+.userTable thead td {
+    background-color: rgb(194, 231, 255);
+}
+
+.closeBtn {
+    width: 50px;
+    margin-left: auto;
+    margin-bottom: -20px;
+    margin-top: -5px;
+    margin-right: -5px;
+}
+
+@media screen and (max-width: 700px) {
+    .userTables {
+        grid-template-columns: 1fr;
+    }
+}

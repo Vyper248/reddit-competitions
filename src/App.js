@@ -4,6 +4,7 @@ import Input from './components/Input';
 import Region from './components/Region';
 import Winners from './components/Winners';
 import Stats from './components/Stats';
+import UserStats from './components/UserStats/UserStats';
 
 class App extends Component {
     constructor(){
@@ -19,6 +20,7 @@ class App extends Component {
             winners: [],
             winnersMethod: 'Random.org',
             winnersStatus: 1,
+            selectedWinner: '',
             stats: [],
             total: 0,
             processText: 'Process',
@@ -31,7 +33,7 @@ class App extends Component {
         this.comments = [];
     }
     
-    render() {        
+    render() {    
         return (
             <div className="App">
                 <h1>Reddit Competition Parser</h1>
@@ -61,8 +63,8 @@ class App extends Component {
                         <button onClick={this.getComments} className="button green">{this.state.processText}</button>
                     </div>
                     <Stats stats={this.state.stats} total={this.state.total} downloadData={this.state.downloadData}/>
-                    <Winners winners={this.state.winners} pickWinners={this.pickWinners} total={this.state.total} method={this.state.winnersMethod} status={this.state.winnersStatus}/>
-                    
+                    <Winners winners={this.state.winners} pickWinners={this.pickWinners} selectWinner={this.selectWinner} total={this.state.total} method={this.state.winnersMethod} status={this.state.winnersStatus}/>
+                    <UserStats username={this.state.selectedWinner} setUsername={this.selectWinner}/>
                 </div>
             </div>
         );
@@ -122,6 +124,12 @@ class App extends Component {
         regions.pop();
         this.setState({regions});
     }
+    
+    selectWinner = (selectedWinner) => {
+        return () => {
+            this.setState({selectedWinner});
+        };
+    };
     
     getComments = () => {
         if (this.state.url.length === 0 || this.state.status === 1) return;

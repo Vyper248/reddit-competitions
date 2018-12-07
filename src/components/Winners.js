@@ -1,7 +1,7 @@
 import React from 'react';
 import './Winners.css';
 
-const Winners = ({winners, pickWinners, total, method, status}) => {
+const Winners = ({winners, pickWinners, selectWinner, total, method, status}) => {
     let buttonText = 'Pick Winners';
     if (status === 0) buttonText = 'Loading...';
     
@@ -24,7 +24,7 @@ const Winners = ({winners, pickWinners, total, method, status}) => {
                                 <label>{region.name}</label>
                                 {
                                     region.arr.map((winner, i) => {
-                                        return <div key={i}>{winner.author}</div>
+                                        return <div key={i} onClick={selectWinner(winner.author)}>{winner.author}</div>
                                     })
                                 }
                             </div>
