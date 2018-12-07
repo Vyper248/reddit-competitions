@@ -8,7 +8,7 @@ const Winners = ({winners, pickWinners}) => {
     
     return (
         <div className="winners roundedBorder">
-            <label>Winners - <span class="slim button green" onClick={pickWinners}>Pick Again</span></label>
+            <label>Winners - <span className="slim button green" onClick={pickWinners}>Pick Again</span></label>
             <div className="winnerRegions">
                 {
                     winners.map((region, i) => {

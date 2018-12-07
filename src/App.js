@@ -10,8 +10,8 @@ class App extends Component {
         super();
         this.state = {
             regions: [
-                {name: 'EU', qty: 1, variations: ['EU', 'Eu', 'eU', 'Europe']},
-                {name: 'NA', qty: 1, variations: ['NA', 'Na', 'nA', 'North American', 'North America', 'North america', 'north america', 'N.A', 'N A']},
+                {name: 'EU', qty: 1, variations: ['EU', 'Eu', 'eU', 'Europe', 'UK']},
+                {name: 'NA', qty: 1, variations: ['NA', 'Na', 'nA', 'North American', 'North America', 'North america', 'north america', 'N.A', 'N A', 'US']},
                 {name: '', qty: 0, variations: []}
             ],
             ignoredUsers: [],
@@ -27,6 +27,7 @@ class App extends Component {
         
         this.totalComments = 0;
         this.results = {};
+        this.comments = [];
     }
     
     render() {        
@@ -77,11 +78,11 @@ class App extends Component {
         
         //just to make it easier if someone removes a region but then wants it back
         if (regions[index].variations.length === 0 && regions[index].name === 'NA'){
-            regions[index].variations.push(...['NA', 'Na', 'nA', 'North American', 'North America', 'North america', 'north america', 'N.A', 'N A']);
+            regions[index].variations.push(...['NA', 'Na', 'nA', 'North American', 'North America', 'North america', 'north america', 'N.A', 'N A', 'US']);
         }
         
         else if (regions[index].variations.length === 0 && regions[index].name === 'EU'){
-            regions[index].variations.push(...['EU', 'Eu', 'eU', 'Europe']);
+            regions[index].variations.push(...['EU', 'Eu', 'eU', 'Europe', 'UK']);
         }
         
         this.setState({regions});
@@ -91,18 +92,22 @@ class App extends Component {
         const regions = this.state.regions;
         const index = e.target.getAttribute('index');
         regions[index].variations = e.target.value.split(',').map(val => val.trim());
-        this.setState({regions});
+        this.setState({regions}, () => {
+            if (this.comments.length > 0) this.onComplete(this.comments);
+        });
     }
     
     setRegionQty = (e) => {
         const regions = this.state.regions;
         const index = e.target.getAttribute('index');
-        regions[index].qty = e.target.value;
+        regions[index].qty = parseInt(e.target.value) || '';
         this.setState({regions});
     };
     
     setIgnored = (e) => {
-        this.setState({ignoredUsers: e.target.value.split('\n')});
+        this.setState({ignoredUsers: e.target.value.split('\n')}, ()=>{
+            if (this.comments.length > 0) this.onComplete(this.comments);
+        });
     };
     
     addRegion = () => {
@@ -121,7 +126,7 @@ class App extends Component {
         if (this.state.url.length === 0 || this.state.status === 1) return;
         //get json data from Reddit
         this.totalComments = 0;
-        this.setState({total: 0, winners: [], stats: [], percentage: 0, processText: 'Loading', status: 1});
+        this.setState({total: 0, winners: [], stats: [], percentage: 0, processText: 'Loading..', status: 1});
         let allComments = [];
         
         fetch(this.state.url+'.json').then(response => response.json()).then(data => {
@@ -214,12 +219,13 @@ class App extends Component {
     testValue = (value, conditions) => {
         let match = false;
         conditions.forEach((condition) => {
+            if (condition.length === 0) return;
             if (value.indexOf(condition) !== -1) match = true;
         });
         return match;
     }
     
-    testRegions = (comment, regions, extras) => {
+    testRegions = (comment, regions, extras, map) => {
         //first, check value against each region and set to true or false
         let result = {};
         Object.keys(regions).forEach((region) => {
@@ -237,7 +243,10 @@ class App extends Component {
             extras.others.push(comment);
         } else {
             Object.keys(result).forEach((region) => {
-                if (result[region]) regions[region].array.push(comment);
+                if (result[region]) {
+                    regions[region].array.push(comment);
+                    map[comment.author] = true;
+                }
             });
         }
     }
@@ -267,8 +276,7 @@ class App extends Component {
             
             //if author hasn't already posted a comment, then add to correct list
             if (!map[author]) {
-                map[author] = true;
-                this.testRegions({author, body}, regions, extras);
+                this.testRegions({author, body}, regions, extras, map);
             } else {
                 extras.duplicates.push({author, body});
             }
@@ -276,6 +284,7 @@ class App extends Component {
     };
     
     onComplete = (comments) => {        
+        this.comments = comments;
         let regions = {};
         
         this.state.regions.forEach(region => {
@@ -304,7 +313,7 @@ class App extends Component {
         function parseList(list, type, hasId){
             type = type[0].toUpperCase() + type.slice(1);
             list.forEach((item, index) => {
-                if (hasId) downloadData += (index+1) + ','; else downloadData += ',';
+                hasId ? downloadData += (index+1) + ',' : downloadData += ',';
                 downloadData += item.author + ',' + type + ',' + item.body;
                 downloadData += '\n';
             });
@@ -352,13 +361,13 @@ class App extends Component {
             let numbers = [];
             for (let i = 0; i < region.qty; i++){
                 let random = parseInt(Math.random()*region.array.length);
-                while (numbers.includes(random)) random = parseInt(Math.random()*region.array.length);
+                while (numbers.includes(random)) random = parseInt(Math.random()*region.array.length)-1;
                 numbers.push(random);
                 const chosen = region.array[random];
                 // const author = chosen.author;
                 // const userData = await fetch('https://www.reddit.com/user/'+author+'/about.json').then(resp => resp.json());
                 // console.log(userData);
-                obj.arr.push(chosen);
+                if (chosen) obj.arr.push(chosen);
             }
             winners.push(obj);
         });
