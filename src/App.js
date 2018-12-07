@@ -16,8 +16,9 @@ class App extends Component {
             ],
             ignoredUsers: [],
             url: 'https://www.reddit.com/r/PSVR/comments/9gykgl/transference_playstation_vr_game_key_giveaway_we/',
-            accountAge: 4,
             winners: [],
+            winnersMethod: 'Random.org',
+            winnersStatus: 1,
             stats: [],
             total: 0,
             processText: 'Process',
@@ -60,7 +61,7 @@ class App extends Component {
                         <button onClick={this.getComments} className="button green">{this.state.processText}</button>
                     </div>
                     <Stats stats={this.state.stats} total={this.state.total} downloadData={this.state.downloadData}/>
-                    <Winners winners={this.state.winners} pickWinners={this.pickWinners}/>
+                    <Winners winners={this.state.winners} pickWinners={this.pickWinners} total={this.state.total} method={this.state.winnersMethod} status={this.state.winnersStatus}/>
                     
                 </div>
             </div>
@@ -343,12 +344,12 @@ class App extends Component {
         this.results = regions;
         
         //pick some winners
-        this.pickWinners();
+        //this.pickWinners();
                 
         this.setState({stats, total, status: 0, processText: 'Process', downloadData: encodeURI(downloadData)});
     }
     
-    pickWinners = () => {
+    pickWinners = async () => {
         const winners = [];
         
         this.state.regions.forEach(region => {
@@ -356,23 +357,71 @@ class App extends Component {
             this.results[region.name].qty = region.qty;
         });
         
-        Object.values(this.results).forEach(region => {
+        const regions = Object.values(this.results);
+        for await (let region of regions){
             let obj = {name: region.name, arr: []};
-            let numbers = [];
+            let randomNumbers = await this.getRandomNumbers(region.qty, region.array.length);
             for (let i = 0; i < region.qty; i++){
-                let random = parseInt(Math.random()*region.array.length);
-                while (numbers.includes(random)) random = parseInt(Math.random()*region.array.length)-1;
-                numbers.push(random);
+                let random = randomNumbers.shift();
                 const chosen = region.array[random];
-                // const author = chosen.author;
-                // const userData = await fetch('https://www.reddit.com/user/'+author+'/about.json').then(resp => resp.json());
-                // console.log(userData);
                 if (chosen) obj.arr.push(chosen);
             }
             winners.push(obj);
-        });
+        }    
         
         this.setState({winners});
+    }
+    
+    getRandomNumbers = async (qty, max) => {
+        // fetching from Random.org
+        this.setState({winnersStatus: 0});
+        try {
+            const resp = await fetch('https://api.random.org/json-rpc/1/invoke', {
+                method: "POST",
+                mode: "cors",
+                headers: {
+                    "Content-Type": "application/json; charset=utf-8",
+                },
+                referrer: "no-referrer",
+                body: JSON.stringify({
+                    jsonrpc: '2.0',
+                    method: 'generateIntegers',
+                    params: {
+                        apiKey: '68ae5679-2cbb-4b25-8ab0-f0da1a524c21',
+                        n: qty,
+                        min: 1,
+                        max: max
+                    },
+                    id: 1
+                })
+            });
+            const data = await resp.json();
+            
+            this.setState({winnersStatus: 1});
+
+            if (data.error){
+                this.setState({winnersMethod: 'Math.random()'});
+                return this.randomNumberFallback(qty, max);
+            } else {
+                const requestsLeft = data.result.requestsLeft;
+                this.setState({winnersMethod: 'Random.org - Requests remaining: '+requestsLeft});
+                return data.result.random.data;
+            }
+        } catch(err) {
+            this.setState({winnersMethod: 'Math.random()'});
+            this.setState({winnersStatus: 1});
+            return this.randomNumberFallback(qty, max);
+        }
+    };
+    
+    randomNumberFallback = (qty, max) => {
+        let numbers = [];
+        for (let i = 0; i < qty; i++){
+            let random = parseInt(Math.random()*max);
+            while (numbers.includes(random)) random = parseInt(Math.random()*max);
+            numbers.push(random);
+        }
+        return numbers;
     }
 }
 
