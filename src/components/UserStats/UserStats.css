@@ -18,7 +18,6 @@
 .userTable {
     width: 100%;
     border-collapse: collapse;
-    
 }
 
 .tableDiv {
@@ -55,5 +54,12 @@
 @media screen and (max-width: 700px) {
     .userTables {
         grid-template-columns: 1fr;
+        min-height: auto;
+        max-height: 1200px;
+    }
+    
+    .tableDiv {
+        height: auto;
+        max-height: 300px;
     }
 }

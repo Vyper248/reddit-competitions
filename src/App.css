@@ -1,3 +1,8 @@
+.App {
+    max-width: 1000px;
+    margin: auto;
+}
+
 .grid {
     display: grid;
     grid-template-columns: 200px auto;
@@ -53,6 +58,12 @@ textarea {
 .button.red {
     border-color: red;
     color: red;
+}
+
+.button.disabled {
+    border-color: gray;
+    color: gray;
+    cursor: default;
 }
 
 .button:focus {

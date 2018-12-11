@@ -28,6 +28,7 @@ class UserStats extends Component {
             subsCommentedTo: []
         }
         this.lock = false;
+        this.queuedUsername = undefined;
     }
     
     render(){
@@ -57,9 +58,13 @@ class UserStats extends Component {
     }
     
     componentDidUpdate(){
-        if (this.lock) return;
         if (this.state.username !== this.props.username){
-            this.setState({username: this.props.username}, this.gatherData);
+            if (this.lock){
+                this.queuedUsername = this.props.username;
+                return;
+            } else {
+                this.setState({username: this.props.username}, this.gatherData);
+            }
         }
     }
     
@@ -68,7 +73,7 @@ class UserStats extends Component {
     }
     
     getSubmissions = async (username, after = '') => {
-        if (username.length === 0) return;
+        if (username.length === 0 || this.queuedUsername) return;
         try {
             const resp = await fetch('https://www.reddit.com/user/'+username+'/submitted.json?limit=100&after='+after);
             const json = await resp.json();
@@ -86,7 +91,7 @@ class UserStats extends Component {
     }
     
     getComments = async (username, after = '') => {
-        if (username.length === 0) return;
+        if (username.length === 0 || this.queuedUsername) return;
         try {
             const resp = await fetch('https://www.reddit.com/user/'+username+'/comments.json?limit=100&after='+after);
             const json = await resp.json();
@@ -111,8 +116,14 @@ class UserStats extends Component {
             
             await this.getSubmissions(this.state.username);
             await this.getComments(this.state.username);
-
+            
             this.lock = false;
+            if (this.queuedUsername){
+                let temp = this.queuedUsername;
+                this.queuedUsername = undefined;
+                this.setState({username: temp}, this.gatherData);
+            }
+            
         }
     }
     

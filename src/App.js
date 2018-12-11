@@ -24,6 +24,7 @@ class App extends Component {
             stats: [],
             total: 0,
             processText: 'Process',
+            processBlock: false,
             downloadData: '',
             status: 0
         };
@@ -31,9 +32,14 @@ class App extends Component {
         this.totalComments = 0;
         this.results = {};
         this.comments = [];
+        this.currentURL = '';
     }
     
     render() {    
+        
+        let processClass = 'button green';
+        if (this.state.processBlock) processClass = 'button disabled';
+        
         return (
             <div className="App">
                 <h1>Reddit Competition Parser</h1>
@@ -60,7 +66,7 @@ class App extends Component {
                         }
                     </div>
                     <div className="processBtn">
-                        <button onClick={this.getComments} className="button green">{this.state.processText}</button>
+                        <button onClick={this.getComments} className={processClass}>{this.state.processText}</button>
                     </div>
                     <Stats stats={this.state.stats} total={this.state.total} downloadData={this.state.downloadData}/>
                     <Winners winners={this.state.winners} pickWinners={this.pickWinners} selectWinner={this.selectWinner} total={this.state.total} method={this.state.winnersMethod} status={this.state.winnersStatus}/>
@@ -72,6 +78,11 @@ class App extends Component {
     
     setUrl = (e) => {
         this.setState({url: e.target.value});
+        if (e.target.value !== this.currentURL){
+            this.setState({processBlock: false, processText: 'Process'});
+        } else {
+            this.setState({processBlock: true, processText: 'Process'});
+        }
     }
     
     setRegionName = (e) => {
@@ -132,7 +143,7 @@ class App extends Component {
     };
     
     getComments = () => {
-        if (this.state.url.length === 0 || this.state.status === 1) return;
+        if (this.state.url.length === 0 || this.state.status === 1 || this.state.processBlock) return;
         //get json data from Reddit
         this.totalComments = 0;
         this.setState({total: 0, winners: [], stats: [], percentage: 0, processText: 'Loading..', status: 1});
@@ -294,6 +305,7 @@ class App extends Component {
     
     onComplete = (comments) => {        
         this.comments = comments;
+        this.currentURL = this.state.url;
         let regions = {};
         
         this.state.regions.forEach(region => {
@@ -354,7 +366,7 @@ class App extends Component {
         //pick some winners
         //this.pickWinners();
                 
-        this.setState({stats, total, status: 0, processText: 'Process', downloadData: encodeURI(downloadData)});
+        this.setState({stats, total, status: 0, processText: 'Process', downloadData: encodeURI(downloadData), processBlock: true});
     }
     
     pickWinners = async () => {
