@@ -4,19 +4,19 @@ self.__precacheManifest = [
     "url": "/reddit-competitions/static/js/runtime~main.80e71d6d.js"
   },
   {
-    "revision": "de1622d4a35f857cce2f",
-    "url": "/reddit-competitions/static/js/main.de1622d4.chunk.js"
+    "revision": "c952d0489429a5b36330",
+    "url": "/reddit-competitions/static/js/main.c952d048.chunk.js"
   },
   {
     "revision": "cc4a342f53575f50876e",
     "url": "/reddit-competitions/static/js/1.cc4a342f.chunk.js"
   },
   {
-    "revision": "de1622d4a35f857cce2f",
+    "revision": "c952d0489429a5b36330",
     "url": "/reddit-competitions/static/css/main.7121ad82.chunk.css"
   },
   {
-    "revision": "cd85fbb83d3fa98a6cf70c24f88dcd5e",
+    "revision": "7df130867b3557cf15d51dd593547303",
     "url": "/reddit-competitions/index.html"
   }
 ];
