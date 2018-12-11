@@ -16,7 +16,7 @@ class App extends Component {
                 {name: '', qty: 0, variations: []}
             ],
             ignoredUsers: [],
-            url: 'https://www.reddit.com/r/PSVR/comments/9gykgl/transference_playstation_vr_game_key_giveaway_we/',
+            url: '',
             winners: [],
             winnersMethod: 'Random.org',
             winnersStatus: 1,
@@ -46,6 +46,7 @@ class App extends Component {
                 <div className="grid">
                     <div className="url">
                         <label>URL</label>
+                        <div className="example">(Example: https://www.reddit.com/r/PSVR/comments/9gykgl/transference_playstation_vr_game_key_giveaway_we/)</div>
                         <Input onChange={this.setUrl} value={this.state.url} placeholder='URL'/>
                     </div>
                     <div className="ignored">

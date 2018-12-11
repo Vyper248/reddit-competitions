@@ -14,6 +14,12 @@
     grid-column: 1 / span 2;
 }
 
+.example {
+    margin-bottom: 5px;
+    color: gray;
+    font-size: 0.8em;
+}
+
 label {
     text-align: center;
     display: block;
@@ -43,6 +49,7 @@ textarea {
     cursor: pointer;
     transition: 0.3s;
     margin: 5px;
+    background-color: white;
 }
 
 .slim.button {
