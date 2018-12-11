@@ -16,7 +16,7 @@ self.__precacheManifest = [
     "url": "/reddit-competitions/static/css/main.f30ab92f.chunk.css"
   },
   {
-    "revision": "cf341f8b3f426e7412c6bd57c09a74b0",
+    "revision": "6296aba9a6df9cc9f7df6023f844a777",
     "url": "/reddit-competitions/index.html"
   }
 ];
