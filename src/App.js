@@ -150,7 +150,7 @@ class App extends Component {
         this.setState({total: 0, winners: [], stats: [], percentage: 0, processText: 'Loading..', status: 1});
         let allComments = [];
         
-        fetch(this.state.url+'.json').then(response => response.json()).then(data => {
+        fetch(this.state.url+'.json').then(this.handleErrors).then(response => response.json()).then(data => {
             let comments = data[1].data.children;
             
             //keep track of percentage
@@ -174,7 +174,16 @@ class App extends Component {
             } else {
                 this.onComplete(allComments);
             }
-        })
+        }).catch(err => {
+            this.setState({status: 0, processText: 'Process', processBlock: false});
+        });
+    }
+    
+    handleErrors = (response) => {
+        if (!response.ok) {
+            throw Error(response.statusText);
+        }
+        return response;
     }
     
     updatePercentage = (comments) => {
