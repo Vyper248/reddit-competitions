@@ -16,6 +16,7 @@ const Winners = ({winners, pickWinners, selectWinner, total, method, status}) =>
             <button className="button green" onClick={pickWinners}>{buttonText}</button>
             <p>Method used for random numbers: {method}</p>
             <label>Winners</label>
+            <p>(Select one for user history)</p>
             <div className="winnerRegions">
                 {
                     winners.map((region, i) => {
@@ -24,7 +25,11 @@ const Winners = ({winners, pickWinners, selectWinner, total, method, status}) =>
                                 <label>{region.name}</label>
                                 {
                                     region.arr.map((winner, i) => {
-                                        return <div key={i} onClick={selectWinner(winner.author)}>{winner.author}</div>
+                                        return (
+                                            <div key={i}>
+                                                <input type="radio" name="winner" onClick={selectWinner(winner.author)}/><a href={"https://www.reddit.com/user/"+winner.author} target="_blank" rel="noopener noreferrer">{winner.author}</a>
+                                            </div>
+                                        )
                                     })
                                 }
                             </div>

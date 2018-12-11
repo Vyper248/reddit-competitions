@@ -46,7 +46,7 @@ class App extends Component {
                 <div className="grid">
                     <div className="url">
                         <label>URL</label>
-                        <div className="example">(Example: https://www.reddit.com/r/PSVR/comments/9gykgl/transference_playstation_vr_game_key_giveaway_we/)</div>
+                        <div className="example">Example: <input type="test" value="https://www.reddit.com/r/PSVR/comments/9gykgl/transference_playstation_vr_game_key_giveaway_we/" readOnly/></div>
                         <Input onChange={this.setUrl} value={this.state.url} placeholder='URL'/>
                     </div>
                     <div className="ignored">

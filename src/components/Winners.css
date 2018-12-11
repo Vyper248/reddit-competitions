@@ -12,4 +12,14 @@
     margin: 10px;
     padding: 10px 20px;
     line-height: 1.5em;
+    text-align: left;
+}
+
+.winnerRegion input[type="radio"] {
+    margin-right: 10px;
+}
+
+.winners p:nth-of-type(2) {
+    margin: 0px;
+    color: gray;
 }

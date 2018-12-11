@@ -20,6 +20,14 @@
     font-size: 0.8em;
 }
 
+.example input {
+    width: 540px;
+    max-width: 90vw;
+    border: none;
+    color: gray;
+    margin: auto;
+}
+
 label {
     text-align: center;
     display: block;
