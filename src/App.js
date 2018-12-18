@@ -12,7 +12,7 @@ class App extends Component {
         this.state = {
             regions: [
                 {name: 'EU', qty: 1, variations: ['EU', 'Eu', 'eU', 'Europe', 'UK']},
-                {name: 'NA', qty: 1, variations: ['NA', 'Na', 'nA', 'North American', 'North America', 'North america', 'north america', 'N.A', 'N A', 'US']},
+                {name: 'NA', qty: 1, variations: ['NA', 'Na', 'nA', 'North American', 'North America', 'North america', 'north america', 'N.A', 'N A', 'US', 'N/A']},
                 {name: '', qty: 0, variations: []}
             ],
             ignoredUsers: [],
@@ -93,7 +93,7 @@ class App extends Component {
         
         //just to make it easier if someone removes a region but then wants it back
         if (regions[index].variations.length === 0 && regions[index].name === 'NA'){
-            regions[index].variations.push(...['NA', 'Na', 'nA', 'North American', 'North America', 'North america', 'north america', 'N.A', 'N A', 'US']);
+            regions[index].variations.push(...['NA', 'Na', 'nA', 'North American', 'North America', 'North america', 'north america', 'N.A', 'N A', 'US', 'N/A']);
         }
         
         else if (regions[index].variations.length === 0 && regions[index].name === 'EU'){
@@ -251,6 +251,7 @@ class App extends Component {
         conditions.forEach((condition) => {
             if (condition.length === 0) return;
             if (value.indexOf(condition) !== -1) match = true;
+            if (value.toLowerCase() === condition.toLowerCase()) match = true; // test for exact match ignoring case
         });
         return match;
     }
