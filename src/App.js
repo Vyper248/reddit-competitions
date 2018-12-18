@@ -394,6 +394,7 @@ class App extends Component {
             for (let i = 0; i < region.qty; i++){
                 let random = randomNumbers.shift();
                 const chosen = region.array[random];
+                chosen.id = random+1;
                 if (chosen) obj.arr.push(chosen);
             }
             winners.push(obj);
@@ -420,7 +421,8 @@ class App extends Component {
                         apiKey: '68ae5679-2cbb-4b25-8ab0-f0da1a524c21',
                         n: qty,
                         min: 1,
-                        max: max
+                        max: max,
+                        replacement: false,
                     },
                     id: 1
                 })
