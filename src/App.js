@@ -421,8 +421,8 @@ class App extends Component {
                     params: {
                         apiKey: '68ae5679-2cbb-4b25-8ab0-f0da1a524c21',
                         n: qty,
-                        min: 1,
-                        max: max,
+                        min: 0,
+                        max: max-1,
                         replacement: false,
                     },
                     id: 1
