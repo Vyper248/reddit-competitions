@@ -250,8 +250,12 @@ class App extends Component {
         let match = false;
         conditions.forEach((condition) => {
             if (condition.length === 0) return;
-            if (value.indexOf(condition) !== -1) match = true;
-            if (value.toLowerCase() === condition.toLowerCase()) match = true; // test for exact match ignoring case
+            if (value.indexOf(condition) !== -1) {match = true; return;} //general test to see if value is anywhere within the string, case sensitive
+            
+            if (value.toLowerCase() === condition.toLowerCase()) {match = true; return;} // test for exact match ignoring case (eg. 'eu');
+            
+            let atBeginning = new RegExp('^('+condition+' )', 'i'); //test for match at the beginning with a space after, ignoring case (eg. 'eu please!')
+            if (atBeginning.test(value)) {match = true; return;}
         });
         return match;
     }
