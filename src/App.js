@@ -26,13 +26,16 @@ class App extends Component {
             processText: 'Process',
             processBlock: false,
             downloadData: '',
-            status: 0
+            status: 0,
+            groupTopLevel: false,
+            topLevelAuthor: '',
         };
         
         this.totalComments = 0;
         this.results = {};
         this.comments = [];
         this.currentURL = '';
+        this.parentComments = [];
     }
     
     render() {    
@@ -66,15 +69,29 @@ class App extends Component {
                             })
                         }
                     </div>
+                    <div className="grouping">
+                        <span id="topCommentDiv">Top Comment Grouping: <input id="groupSet" type="checkbox" onChange={this.setTopLevelGrouping} checked={this.state.groupTopLevel ? true : false}/></span>
+                        <span id="topAuthorDiv">Top Comment Author: <input id="groupAuthor" className="roundedBorder" type="text" onChange={this.setTopLevelAuthor} value={this.state.topLevelAuthor}/></span>
+                    </div>
                     <div className="processBtn">
                         <button onClick={this.getComments} className={processClass}>{this.state.processText}</button>
                     </div>
                     <Stats stats={this.state.stats} total={this.state.total} downloadData={this.state.downloadData}/>
-                    <Winners winners={this.state.winners} pickWinners={this.pickWinners} selectWinner={this.selectWinner} total={this.state.total} method={this.state.winnersMethod} status={this.state.winnersStatus}/>
+                    {
+                        this.state.groupTopLevel ? null : <Winners winners={this.state.winners} pickWinners={this.pickWinners} selectWinner={this.selectWinner} total={this.state.total} method={this.state.winnersMethod} status={this.state.winnersStatus}/>
+                    }
                     <UserStats username={this.state.selectedWinner} setUsername={this.selectWinner}/>
                 </div>
             </div>
         );
+    }
+
+    setTopLevelGrouping = (e) => {
+        this.setState({groupTopLevel: e.target.checked, processBlock: false});
+    }
+
+    setTopLevelAuthor = (e) => {
+        this.setState({topLevelAuthor: e.target.value, processBlock: false});
     }
     
     setUrl = (e) => {
@@ -280,7 +297,8 @@ class App extends Component {
             Object.keys(result).forEach((region) => {
                 if (result[region]) {
                     regions[region].array.push(comment);
-                    map[comment.author] = true;
+                    if (this.state.groupTopLevel) map[comment.parent][comment.author] = true;
+                    else map[comment.author] = true;
                 }
             });
         }
@@ -288,32 +306,60 @@ class App extends Component {
     
     sortComments = (comments, regions, extras, map) => {
         let previousWinners = this.state.ignoredUsers;
+
+        let parents = [];
+        comments.forEach(comment => {
+            if (comment.parent_id.includes('ef6el5') && comment.author === this.state.topLevelAuthor) {                
+                parents.push({id:comment.id, body: comment.body});
+            }
+        });        
+        this.parentComments = parents;
+
+        if (this.state.groupTopLevel) {
+            parents.forEach(parent => {
+                map[parent.id] = {};
+            });
+        }        
         
         comments.forEach((comment) => {
+            // console.log(comment);
+            
             let body = comment.body;
             let author = comment.author;
+            let parent = comment.parent_id.replace('t1_', '');            
                     
             //replace commas and new lines with full stop - otherwise affect the csv formatting
             body = body.replace(/,/g, '. ');
             body = body.replace(/\n/g, '. ');
+            body = body.replace(/#/g, '');
             
             //check if author is a previous winner and skip if true
             if (previousWinners.indexOf(author) !== -1){
-                extras.ignored.push({author, body});
+                extras.ignored.push({author, body, parent});
                 return;
             }
             
             //if authors name is unkonwn, add to extras array
             if (author === '[deleted]'){
-                extras.others.push({author, body});
+                extras.others.push({author, body, parent});
                 return;
             }
             
             //if author hasn't already posted a comment, then add to correct list
-            if (!map[author]) {
-                this.testRegions({author, body}, regions, extras, map);
+            if (this.state.groupTopLevel) {
+                if (map[parent] && !map[parent][author]) {
+                    this.testRegions({author, body, parent}, regions, extras, map);
+                } else if (!map[parent]) {
+                    extras.others.push({author, body, parent});
+                } else {
+                    extras.duplicates.push({author, body, parent});
+                }
             } else {
-                extras.duplicates.push({author, body});
+                if (!map[author]) {
+                    this.testRegions({author, body, parent}, regions, extras, map);
+                } else {
+                    extras.duplicates.push({author, body, parent});
+                }
             }
         });
     };
@@ -321,6 +367,7 @@ class App extends Component {
     onComplete = (comments) => {        
         this.comments = comments;
         this.currentURL = this.state.url;
+        let groupTopLevel = this.state.groupTopLevel;
         let regions = {};
         
         this.state.regions.forEach(region => {
@@ -341,40 +388,91 @@ class App extends Component {
         
         let map = {};
         let downloadData = "ID,Username,Type,Text\n";
+        if (groupTopLevel) downloadData = 'Top Comment,'+downloadData;
                 
         //loop through each comment posted
         this.sortComments(comments, regions, extras, map);
+
+        //group all comments by top level
+        let groups = {};
+        if (groupTopLevel) {
+            this.parentComments.forEach(parent => {
+                groups[parent.id] = {};
+                this.state.regions.forEach(region => {
+                    if (region.name.length === 0) return;
+                    groups[parent.id][region.name] = {
+                        parentBody: parent.body,
+                        name: region.name,
+                        conditions: region.variations,
+                        array: [],
+                        qty: region.qty
+                    }
+                });
+            });
+
+            Object.values(regions).forEach(region => {
+                let regionName = region.name;
+                region.array.forEach(comment => {
+                    groups[comment.parent][regionName].array.push(comment);
+                });
+            });
+        } else {
+            groups.single = regions;
+        }
             
         //convert each list to csv format
-        function parseList(list, type, hasId){
+        function parseList(list, type, hasId, group){
+            if (group !== undefined) group = group.replace('#', '');
             type = type[0].toUpperCase() + type.slice(1);
-            list.forEach((item, index) => {
+            list.forEach((item, index) => {                
+                if (groupTopLevel) downloadData += group + ',';
                 hasId ? downloadData += (index+1) + ',' : downloadData += ',';
                 downloadData += item.author + ',' + type + ',' + item.body;
                 downloadData += '\n';
-            });
+            });            
         }
         
         let stats = [];
         let total = 0;
         
         //parse all regions and extras
-        Object.values(regions).forEach((region) => {
-            parseList(region.array, region.name, true);
-            stats.push({
-                name: region.name,
-                qty: region.array.length
+        Object.keys(groups).forEach(group => {
+            let groupRegions = groups[group];
+
+            if (groupTopLevel) {
+                let parent = this.parentComments.find(comment => comment.id === group);
+                let name = parent.body;
+                stats.push({
+                    name: name,
+                    qty: -1,
+                })
+            }
+
+            Object.values(groupRegions).forEach((region) => {
+                parseList(region.array, region.name, true, region.parentBody);
+                stats.push({
+                    name: region.name,
+                    qty: region.array.length
+                });
+                total += region.array.length;
             });
-            total += region.array.length;
         });
+
+        if (groupTopLevel) {
+                stats.push({
+                    name: 'Not in Group',
+                    qty: -1,
+                })
+            }
+        
         Object.keys(extras).forEach((extra) => {
-            parseList(extras[extra], extra, false);
+            parseList(extras[extra], extra, false, '');
             stats.push({
                 name: extra,
                 qty: extras[extra].length
             });
             total += extras[extra].length;
-        });
+        });        
         
         this.results = regions;
         

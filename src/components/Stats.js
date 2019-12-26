@@ -9,6 +9,7 @@ const Stats = ({stats, total, downloadData}) => {
             <label>Stats</label>
             {
                 stats.map((stat, i) => {
+                    if (stat.qty === -1) return <div key={i}><strong>{stat.name}</strong></div>;
                     return <div key={i}>{stat.name} - {stat.qty}</div>;
                 })
             }

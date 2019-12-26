@@ -10,8 +10,17 @@
     grid-gap: 20px;
 }
 
-.url {
+.url, .grouping {
     grid-column: 1 / span 2;
+}
+
+#groupAuthor {
+    width: 200px;
+    font-size: 1em;
+}
+
+#topAuthorDiv {
+    margin-left: 50px;
 }
 
 .example {
